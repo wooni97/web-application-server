@@ -33,8 +33,10 @@ public class RequestHandler extends Thread {
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
             String inputLine = bufferedReader.readLine();
+
             log.debug("request : {}", inputLine);
-            if (inputLine == null) { return;}
+
+            if (inputLine == null) {return;}
 
             String[] tokens = StringUtils.parseValues(inputLine);
             String httpMethod = tokens[0];
