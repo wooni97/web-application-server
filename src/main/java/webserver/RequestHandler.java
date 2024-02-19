@@ -43,6 +43,13 @@ public class RequestHandler extends Thread {
 
             if(url.equals(userCreatePath) && httpMethod.equals("GET")) {
                 User user = createUserWithGetMethod(url);
+
+                String redirectUrl = "/index.html";
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = Files.readAllBytes(new File("./webapp" + redirectUrl).toPath());
+                response302Header(dos, redirectUrl);
+                responseBody(dos, body);
+                return;
             }
 
             int contentLength = 0;
@@ -67,8 +74,12 @@ public class RequestHandler extends Thread {
                 String name = userData.get("name");
                 String email = userData.get("email");
 
-                User user = new User(userId, password, name, email);
-
+                String redirectUrl = "/index.html";
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = Files.readAllBytes(new File("./webapp" + redirectUrl).toPath());
+                response302Header(dos, redirectUrl);
+                responseBody(dos, body);
+                return;
             }
 
 
@@ -93,6 +104,15 @@ public class RequestHandler extends Thread {
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, String location) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: " + location + "\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
