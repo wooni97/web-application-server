@@ -14,6 +14,7 @@ import util.StringUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
+    private static final String userCreatePath = "/user/create";
 
     private Socket connection;
 
@@ -35,11 +36,12 @@ public class RequestHandler extends Thread {
             if (inputLine == null) { return;}
 
             String[] tokens = StringUtils.parseValues(inputLine);
-            String url = null;
-            for (int i = 0; i < tokens.length; i++) {
-                if(tokens[i].startsWith("/")) {
-                    url = tokens[i];
-                }
+            String httpMethod = tokens[0];
+            String url = tokens[1];
+
+
+            if(url.equals(userCreatePath) && httpMethod.equals("GET")) {
+                User user = createUserWithGetMethod(url);
             }
 
             int index = url.indexOf("?");
@@ -94,4 +96,21 @@ public class RequestHandler extends Thread {
             log.error(e.getMessage());
         }
     }
+
+    private User createUserWithGetMethod(String url) {
+        int index = url.indexOf("?");
+        String requestPath = url.substring(0, index);
+        String params = url.substring(index + 1);
+
+        Map<String, String> userData;
+        userData = HttpRequestUtils.parseQueryString(params);
+
+        String userId = userData.get("userId");
+        String password = userData.get("password");
+        String name = userData.get("name");
+        String email = userData.get("email");
+
+        return new User(userId, password, name, email);
+    }
+
 }
