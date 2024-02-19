@@ -66,16 +66,8 @@ public class RequestHandler extends Thread {
                 }
             }
 
-            if(url.equals(userCreatePath) && httpMethod.equals("POST")) {
-                String requestData = IOUtils.readData(bufferedReader, contentLength);
-                Map<String, String> userData;
-                userData = HttpRequestUtils.parseQueryString(requestData);
-
-                String userId = userData.get("userId");
-                String password = userData.get("password");
-                String name = userData.get("name");
-                String email = userData.get("email");
             if(url.startsWith(userCreatePath) && httpMethod.equals("POST")) {
+                user = createUserWithPostMethod(bufferedReader, contentLength);
 
                 String redirectUrl = "/index.html";
                 DataOutputStream dos = new DataOutputStream(out);
@@ -137,6 +129,18 @@ public class RequestHandler extends Thread {
 
         Map<String, String> userData;
         userData = HttpRequestUtils.parseQueryString(params);
+
+        String userId = userData.get("userId");
+        String password = userData.get("password");
+        String name = userData.get("name");
+        String email = userData.get("email");
+
+        return new User(userId, password, name, email);
+    }
+
+    private User createUserWithPostMethod(BufferedReader bufferedReader,int contentLength) throws IOException {
+        String requestData = IOUtils.readData(bufferedReader, contentLength);
+        Map<String, String> userData = HttpRequestUtils.parseQueryString(requestData);
 
         String userId = userData.get("userId");
         String password = userData.get("password");
