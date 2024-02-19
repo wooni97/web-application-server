@@ -10,6 +10,7 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
+import util.IOUtils;
 import util.StringUtils;
 
 public class RequestHandler extends Thread {
@@ -44,24 +45,33 @@ public class RequestHandler extends Thread {
                 User user = createUserWithGetMethod(url);
             }
 
-            int index = url.indexOf("?");
-            String requestPath = url.substring(0, index);
-            String params = url.substring(index + 1);
+            int contentLength = 0;
 
-            Map<String, String> userData = new HashMap<>();
-            userData = HttpRequestUtils.parseQueryString(params);
-
-            String userId = userData.get("userId");
-            String password = userData.get("password");
-            String name = userData.get("name");
-            String email = userData.get("email");
-
-            User user = new User(userId, password, name, email);
-            log.debug("user : {}", user);
             while(!inputLine.isEmpty()){
                 inputLine = bufferedReader.readLine();
                 log.debug("header : {}", inputLine);
+
+                if(inputLine.contains("Content-Length")) {
+                    String[] lineTokens = inputLine.split(" ");
+                    contentLength = Integer.parseInt(lineTokens[1]);
+                }
             }
+
+            if(url.equals(userCreatePath) && httpMethod.equals("POST")) {
+                String requestData = IOUtils.readData(bufferedReader, contentLength);
+                Map<String, String> userData;
+                userData = HttpRequestUtils.parseQueryString(requestData);
+
+                String userId = userData.get("userId");
+                String password = userData.get("password");
+                String name = userData.get("name");
+                String email = userData.get("email");
+
+                User user = new User(userId, password, name, email);
+
+            }
+
+
 
 //            DataOutputStream dos = new DataOutputStream(out);
 //            byte[] body = "Hello World".getBytes();
