@@ -37,6 +37,11 @@ public class RequestHandler extends Thread {
                     url = tokens[i];
                 }
             }
+
+            int index = url.indexOf("?");
+            String requestPath = url.substring(0, index);
+            String params = url.substring(index + 1);
+
             while(!inputLine.isEmpty()){
                 inputLine = bufferedReader.readLine();
                 log.debug("header : {}", inputLine);
