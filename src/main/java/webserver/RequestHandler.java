@@ -3,9 +3,13 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.HttpRequestUtils;
 import util.StringUtils;
 
 public class RequestHandler extends Thread {
@@ -42,6 +46,16 @@ public class RequestHandler extends Thread {
             String requestPath = url.substring(0, index);
             String params = url.substring(index + 1);
 
+            Map<String, String> userData = new HashMap<>();
+            userData = HttpRequestUtils.parseQueryString(params);
+
+            String userId = userData.get("userId");
+            String password = userData.get("password");
+            String name = userData.get("name");
+            String email = userData.get("email");
+
+            User user = new User(userId, password, name, email);
+            log.debug("user : {}", user);
             while(!inputLine.isEmpty()){
                 inputLine = bufferedReader.readLine();
                 log.debug("header : {}", inputLine);
