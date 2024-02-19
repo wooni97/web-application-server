@@ -5,6 +5,7 @@ import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.StringUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -28,6 +29,13 @@ public class RequestHandler extends Thread {
             log.debug("request : {}", inputLine);
             if (inputLine == null) { return;}
 
+            String[] tokens = StringUtils.parseValues(inputLine);
+            String url = null;
+            for (int i = 0; i < tokens.length; i++) {
+                if(tokens[i].startsWith("/")) {
+                    url = tokens[i];
+                }
+            }
             while(!inputLine.isEmpty()){
                 inputLine = bufferedReader.readLine();
                 log.debug("header : {}", inputLine);
