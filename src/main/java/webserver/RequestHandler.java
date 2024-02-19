@@ -41,8 +41,10 @@ public class RequestHandler extends Thread {
             String url = tokens[1];
 
 
-            if(url.equals(userCreatePath) && httpMethod.equals("GET")) {
-                User user = createUserWithGetMethod(url);
+            User user;
+            if(url.startsWith(userCreatePath) && httpMethod.equals("GET")) {
+                user = createUserWithGetMethod(url);
+                log.debug("user : {}", user);
 
                 String redirectUrl = "/index.html";
                 DataOutputStream dos = new DataOutputStream(out);
@@ -73,6 +75,7 @@ public class RequestHandler extends Thread {
                 String password = userData.get("password");
                 String name = userData.get("name");
                 String email = userData.get("email");
+            if(url.startsWith(userCreatePath) && httpMethod.equals("POST")) {
 
                 String redirectUrl = "/index.html";
                 DataOutputStream dos = new DataOutputStream(out);
