@@ -32,16 +32,14 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            InputStreamReader inputStreamReader = new InputStreamReader(in);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+            String requestLine = bufferedReader.readLine();
 
-            String inputLine = bufferedReader.readLine();
+            log.debug("request : {}", requestLine);
 
             log.debug("request : {}", inputLine);
 
-            if (inputLine == null) {return;}
-
-            String[] tokens = StringUtils.parseValues(inputLine);
+            String[] tokens = StringUtils.parseValues(requestLine);
             String httpMethod = tokens[0];
             String url = tokens[1];
 
@@ -63,17 +61,17 @@ public class RequestHandler extends Thread {
             int contentLength = 0;
             boolean isLogined = false;
 
-            while(!inputLine.isEmpty()){
-                inputLine = bufferedReader.readLine();
-                log.debug("header : {}", inputLine);
+            while(!requestLine.isEmpty()){
+                requestLine = bufferedReader.readLine();
+                log.debug("header : {}", requestLine);
 
-                if (inputLine.contains("Content-Length")) {
-                    String[] lineTokens = inputLine.split(" ");
+                if (requestLine.contains("Content-Length")) {
+                    String[] lineTokens = requestLine.split(" ");
                     contentLength = Integer.parseInt(lineTokens[1]);
                 }
 
-                if (inputLine.contains("Cookie")) {
-                    String[] lineTokens = inputLine.split(" ");
+                if (requestLine.contains("Cookie")) {
+                    String[] lineTokens = requestLine.split(" ");
                     Map<String, String> logined = HttpRequestUtils.parseCookies(lineTokens[1]);
                     log.debug("logined : {}" , logined);
                     isLogined = Boolean.parseBoolean(logined.get("logined"));
