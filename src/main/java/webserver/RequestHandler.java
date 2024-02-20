@@ -17,6 +17,7 @@ import util.StringUtils;
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
     private static final String userCreatePath = "/user/create";
+    private static final String userLoginPath = "/user/login";
 
     private Socket connection;
 
@@ -72,6 +73,8 @@ public class RequestHandler extends Thread {
 
             if(url.startsWith(userCreatePath) && httpMethod.equals("POST")) {
                 user = createUserWithPostMethod(bufferedReader, contentLength);
+                log.debug("user : {}", user);
+
                 DataBase.addUser(user);
 
                 String redirectUrl = "/index.html";
@@ -82,7 +85,31 @@ public class RequestHandler extends Thread {
                 return;
             }
 
+            if(url.equals(userLoginPath)) {
+                String requestData = IOUtils.readData(bufferedReader, contentLength);
+                Map<String, String> loginData = HttpRequestUtils.parseQueryString(requestData);
 
+                User loginUser = DataBase.findUserById(loginData.get("userId"));
+
+                DataOutputStream dos = new DataOutputStream(out);
+
+                if (loginUser != null && loginUser.getPassword().equals(loginData.get("password"))) {
+
+                    log.debug("login success");
+                    String redirectUrl = "/index.html";
+                    byte[] body = Files.readAllBytes(new File("./webapp" + redirectUrl).toPath());
+                    responseLoginSuccessHeader(dos, "true");
+                    responseBody(dos, body);
+                    return;
+                }
+
+                log.debug("login failed");
+                String redirectUrl = "/user/login_failed.html";
+                byte[] body = Files.readAllBytes(new File("./webapp" + redirectUrl).toPath());
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+                return;
+            }
 
 //            DataOutputStream dos = new DataOutputStream(out);
 //            byte[] body = "Hello World".getBytes();
@@ -93,6 +120,17 @@ public class RequestHandler extends Thread {
             byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
             response200Header(dos, body.length);
             responseBody(dos, body);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void responseLoginSuccessHeader(DataOutputStream dos, String isLoginSuccess) {
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Typ: text/html \r\n");
+            dos.writeBytes("Set-Cookie: logined=" + isLoginSuccess);
+            dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
