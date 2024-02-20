@@ -60,14 +60,22 @@ public class RequestHandler extends Thread {
             }
 
             int contentLength = 0;
+            boolean isLogined = false;
 
             while(!inputLine.isEmpty()){
                 inputLine = bufferedReader.readLine();
                 log.debug("header : {}", inputLine);
 
-                if(inputLine.contains("Content-Length")) {
+                if (inputLine.contains("Content-Length")) {
                     String[] lineTokens = inputLine.split(" ");
                     contentLength = Integer.parseInt(lineTokens[1]);
+                }
+
+                if (inputLine.contains("Cookie")) {
+                    String[] lineTokens = inputLine.split(" ");
+                    Map<String, String> logined = HttpRequestUtils.parseCookies(lineTokens[1]);
+                    log.debug("logined : {}" , logined);
+                    isLogined = Boolean.parseBoolean(logined.get("logined"));
                 }
             }
 
