@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
+import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ public class RequestHandler extends Thread {
             if(url.startsWith(userCreatePath) && httpMethod.equals("GET")) {
                 user = createUserWithGetMethod(url);
                 log.debug("user : {}", user);
+                DataBase.addUser(user);
 
                 String redirectUrl = "/index.html";
                 DataOutputStream dos = new DataOutputStream(out);
@@ -70,6 +72,7 @@ public class RequestHandler extends Thread {
 
             if(url.startsWith(userCreatePath) && httpMethod.equals("POST")) {
                 user = createUserWithPostMethod(bufferedReader, contentLength);
+                DataBase.addUser(user);
 
                 String redirectUrl = "/index.html";
                 DataOutputStream dos = new DataOutputStream(out);
