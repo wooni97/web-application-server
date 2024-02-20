@@ -3,7 +3,7 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Map;
 
 import db.DataBase;
@@ -18,6 +18,7 @@ public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
     private static final String userCreatePath = "/user/create";
     private static final String userLoginPath = "/user/login";
+    private static final String userListPath = "/user/list";
 
     private Socket connection;
 
@@ -115,6 +116,35 @@ public class RequestHandler extends Thread {
                 String redirectUrl = "/user/login_failed.html";
                 byte[] body = Files.readAllBytes(new File("./webapp" + redirectUrl).toPath());
                 response200Header(dos, body.length);
+                responseBody(dos, body);
+                return;
+            }
+
+            if (url.equals(userListPath)) {
+                if (!isLogined) {return;}
+
+                Collection<User> users = DataBase.findAll();
+
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("<ul>");
+                users.forEach(u -> {
+                    stringBuilder.append("<li>");
+                    stringBuilder.append(u.getUserId());
+                    stringBuilder.append("</li>");
+                });
+
+                stringBuilder.append("</ul>");
+                String responseBody = stringBuilder.toString();
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = responseBody.getBytes();
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
+
+            if (url.endsWith("css")) {
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+                responseCSS(dos, body.length);
                 responseBody(dos, body);
                 return;
             }
