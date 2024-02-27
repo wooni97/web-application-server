@@ -18,7 +18,7 @@ public class HttpRequest {
     private final InputStream in;
     private String method;
     private String path;
-    private Map<String, String> header = new HashMap<>();
+    private final Map<String, String> header = new HashMap<>();
     private Map<String, String> parameters = new HashMap<>();
 
     public HttpRequest(InputStream in) throws IOException {
