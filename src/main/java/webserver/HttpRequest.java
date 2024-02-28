@@ -61,6 +61,11 @@ public class HttpRequest {
         }
 
         String[] parts = tokens[1].split("\\?");
+
+        if (parts.length == 1) {
+            this.path = parts[0];
+            return;
+        }
         this.path = parts[0];
         this.parameters = HttpRequestUtils.parseQueryString(parts[1]);
     }
