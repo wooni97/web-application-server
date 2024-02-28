@@ -39,6 +39,16 @@ public class HttpResponseTest{
         response.sendRedirect("/index.html");
     }
 
+    @Test
+    public void responseUserList() throws Exception {
+        HttpResponse response =
+                new HttpResponse(createOutputStream("Http_UserList.txt"));
+        String userList = "<table>" + "<tr>" + "<td>jhw</td>" + "</tr>" +
+                "<tr>" + "<td>jhw2</td>" + "</tr>" + "</table>";
+
+        response.forwardBody(userList);
+    }
+
     private OutputStream createOutputStream(String filename) throws FileNotFoundException {
         return new FileOutputStream(new File(testDirectory + filename));
     }
