@@ -44,6 +44,15 @@ public class HttpResponse {
         }
     }
 
+    public void forwardBody(String responseBody) throws IOException {
+        byte[] body = responseBody.getBytes();
+        headers.put("Content-Type", "text/html;charset=utf-8");
+        headers.put("Content-Length", String.valueOf(body.length));
+
+        responseHeader(this.out, STATUS_CODE_200);
+        responseBody(this.out, body);
+    }
+
     public void sendRedirect(String url) throws IOException {
         headers.put("Location", url);
         responseHeader(this.out, STATUS_CODE_300);
@@ -73,4 +82,6 @@ public class HttpResponse {
             log.error(e.getMessage());
         }
     }
+
+
 }
