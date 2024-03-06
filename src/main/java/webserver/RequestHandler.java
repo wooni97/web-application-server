@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import controller.Controller;
+import http.HttpCookie;
 import http.HttpRequest;
 import http.HttpResponse;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ public class RequestHandler extends Thread {
             HttpRequest request = new HttpRequest(in);
             HttpResponse response = new HttpResponse(out);
 
-            if (getJSESSIONID(request.getHeader("Cookie")) == null) {
+            if (request.getCookies().getCookie("JSESSIONID") == null) {
                 response.addHeader("Set-Cookie",
                         "JSEESIONID=" + UUID.randomUUID());
             }
@@ -55,12 +56,6 @@ public class RequestHandler extends Thread {
         }
 
         return path;
-    }
-
-    private String getJSESSIONID(String cookieValue) {
-        Map<String, String> cookies =
-                HttpRequestUtils.parseCookies(cookieValue);
-        return cookies.get("JSESSIONID");
     }
 
 }
