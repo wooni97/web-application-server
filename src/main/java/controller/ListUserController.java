@@ -1,6 +1,7 @@
 package controller;
 
 import db.DataBase;
+import http.HttpSession;
 import model.User;
 import http.HttpRequest;
 import http.HttpResponse;
@@ -22,7 +23,10 @@ public class ListUserController extends AbstractController {
     }
 
     private boolean isLogin(HttpRequest request) {
-        return request.isLogin();
+        HttpSession session = request.getSession();
+        Object user = session.getAttribute("user");
+
+        return user != null;
     }
 
     private String generateHtmlUserList(Collection<User> users) {
