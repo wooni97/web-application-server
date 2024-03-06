@@ -1,6 +1,7 @@
 package controller;
 
 import db.DataBase;
+import http.HttpSession;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,8 @@ public class LoginController extends AbstractController {
         if (loginUser != null && loginUser.getPassword().equals(request.getParameter("password"))) {
             log.debug("login success");
 
-            response.addHeader("Set-Cookie", "logined=true");
+            HttpSession httpSession = request.getSession();
+            httpSession.setAttribute("user", loginUser);
             response.sendRedirect("/index.html");
             return;
         }
