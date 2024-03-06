@@ -1,19 +1,17 @@
-package webserver;
+package controller;
 
 import db.DataBase;
 import model.User;
+import http.HttpRequest;
+import http.HttpResponse;
 
 import java.io.IOException;
 import java.util.Collection;
 
-public class ListUserController extends AbstractController{
-
+public class ListUserController extends AbstractController {
     @Override
-    void doPost(HttpRequest request, HttpResponse response) throws IOException {}
-
-    @Override
-    void doGet(HttpRequest request, HttpResponse response) throws IOException {
-        if (!isLogin(request.getParameter("Cookie"))) {
+    public void doGet(HttpRequest request, HttpResponse response) throws IOException {
+        if (!isLogin(request)) {
             response.sendRedirect("/user/login.html");
             return;
         }
@@ -23,8 +21,8 @@ public class ListUserController extends AbstractController{
         response.forwardBody(responseBody);
     }
 
-    private boolean isLogin(String cookieValue) {
-        return Boolean.parseBoolean(cookieValue);
+    private boolean isLogin(HttpRequest request) {
+        return request.isLogin();
     }
 
     private String generateHtmlUserList(Collection<User> users) {
